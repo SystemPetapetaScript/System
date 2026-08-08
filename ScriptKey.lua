@@ -1,4 +1,4 @@
--- [[ WINDUI STYLE KEY SYSTEM UI ]] --
+-- [[ WINDUI STYLE KEY SYSTEM UI - CUSTOM ICON ]] --
 
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
@@ -8,13 +8,13 @@ local UserInputService = game:GetService("UserInputService")
 local Config = {
     Title = "PetaHub",
     SubTitle = "Key System",
+    IconId = "rbxassetid://124717824553107", -- ID Icon của bạn
     SavedKeyFile = "PetaHub_Key.txt",
     Services = {
         {Name = "Platoboost", Url = "https://platoboost.com/getkey"},
         {Name = "Panda Link", Url = "https://pandadevelopment.net/getkey"}
     },
     Validator = function(key)
-        -- Thay đổi logic check key ở đây
         if key == "PetaHub2026" or #key >= 8 then
             return true, "Xác thực thành công!"
         end
@@ -60,24 +60,32 @@ MainFrame.Parent = ScreenGui
 AddCorner(MainFrame, 12)
 AddStroke(MainFrame, Color3.fromRGB(80, 80, 85), 0.6)
 
--- Top Header Bar (Title + Window Buttons)
+-- Top Header Bar
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 35)
 Header.BackgroundTransparency = 1
 Header.Parent = MainFrame
 
-local LogoIcon = Instance.new("TextLabel")
-LogoIcon.Size = UDim2.new(0, 25, 0, 25)
-LogoIcon.Position = UDim2.new(0, 10, 0, 5)
-LogoIcon.Text = "✦"
-LogoIcon.TextColor3 = Color3.fromRGB(200, 200, 210)
-LogoIcon.TextSize = 14
-LogoIcon.BackgroundTransparency = 1
-LogoIcon.Parent = Header
+-- Khung chứa Icon Hình Tròn (Tránh bị bóp méo)
+local LogoContainer = Instance.new("Frame")
+LogoContainer.Size = UDim2.new(0, 22, 0, 22)
+LogoContainer.Position = UDim2.new(0, 10, 0, 6)
+LogoContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+LogoContainer.ClipsDescendants = true
+LogoContainer.Parent = Header
+AddCorner(LogoContainer, 100) -- Làm cho khung chứa bo tròn hoàn toàn
+AddStroke(LogoContainer, Color3.fromRGB(80, 80, 90), 0.5)
+
+local LogoImage = Instance.new("ImageLabel")
+LogoImage.Size = UDim2.fromScale(1, 1)
+LogoImage.Image = Config.IconId
+LogoImage.ScaleType = Enum.ScaleType.ScaleToFit
+LogoImage.BackgroundTransparency = 1
+LogoImage.Parent = LogoContainer
 
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Size = UDim2.new(0, 150, 0, 20)
-TitleLabel.Position = UDim2.new(0, 35, 0, 4)
+TitleLabel.Position = UDim2.new(0, 38, 0, 4)
 TitleLabel.Text = Config.Title
 TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
 TitleLabel.TextSize = 13
@@ -88,7 +96,7 @@ TitleLabel.Parent = Header
 
 local SubTitleLabel = Instance.new("TextLabel")
 SubTitleLabel.Size = UDim2.new(0, 150, 0, 12)
-SubTitleLabel.Position = UDim2.new(0, 35, 0, 20)
+SubTitleLabel.Position = UDim2.new(0, 38, 0, 20)
 SubTitleLabel.Text = Config.SubTitle
 SubTitleLabel.TextColor3 = Color3.fromRGB(120, 120, 130)
 SubTitleLabel.TextSize = 10
@@ -137,7 +145,7 @@ SidePadding.Parent = Sidebar
 local TabBtn = Instance.new("TextButton")
 TabBtn.Size = UDim2.new(1, 0, 0, 28)
 TabBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 42)
-TabBtn.Text = "  ★  Key Verification"
+TabBtn.Text = "  ★ Key Verification"
 TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 TabBtn.TextSize = 11
 TabBtn.Font = Enum.Font.SourceSansBold
@@ -258,24 +266,18 @@ for _, s in ipairs(Config.Services) do
     end)
 end
 
--- Floating Open Button (Hiển thị khi đóng UI)
+-- Floating Circle Open Button (Cũng được thiết kế dạng hình tròn)
 local ToggleButton = Instance.new("ImageButton")
 ToggleButton.Name = "OpenUI_Toggle"
-ToggleButton.Size = UDim2.new(0, 40, 0, 40)
-ToggleButton.Position = UDim2.new(0, 15, 0.5, -20)
+ToggleButton.Size = UDim2.new(0, 42, 0, 42)
+ToggleButton.Position = UDim2.new(0, 15, 0.5, -21)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
+ToggleButton.Image = Config.IconId
+ToggleButton.ScaleType = Enum.ScaleType.ScaleToFit
 ToggleButton.Visible = false
 ToggleButton.Parent = ScreenGui
-AddCorner(ToggleButton, 20)
-AddStroke(ToggleButton, Color3.fromRGB(80, 80, 90), 0.5)
-
-local ToggleIcon = Instance.new("TextLabel")
-ToggleIcon.Size = UDim2.fromScale(1, 1)
-ToggleIcon.Text = "✦"
-ToggleIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleIcon.TextSize = 18
-ToggleIcon.BackgroundTransparency = 1
-ToggleIcon.Parent = ToggleButton
+AddCorner(ToggleButton, 100) -- Tạo hình tròn hoàn chỉnh cho nút Toggle
+AddStroke(ToggleButton, Color3.fromRGB(80, 80, 90), 0.6)
 
 -- Draggable UI Feature
 local dragging, dragInput, dragStart, startPos
