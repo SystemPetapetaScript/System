@@ -1,324 +1,346 @@
--- [[ REWRITTEN KEY SYSTEM UI (WINDUI STYLE) ]] --
+-- [[ WINDUI STYLE KEY SYSTEM UI ]] --
 
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- Configuration Table
-local KeySystemConfig = {
-    Title = "Key System Verification",
-    SubTitle = "Nhập Key để tiếp tục sử dụng Script",
-    Note = "Vui lòng vượt qua các bước liên kết để lấy key sử dụng trong ngày.",
-    SavedFileName = "ScriptKeyCache.txt",
-    
-    -- Danh sách dịch vụ lấy key
+-- Configuration
+local Config = {
+    Title = "PetaHub",
+    SubTitle = "Key System",
+    SavedKeyFile = "PetaHub_Key.txt",
     Services = {
-        {
-            Name = "Platoboost Service",
-            Desc = "Hệ thống vượt link Platoboost tốc độ cao",
-            Url = "https://platoboost.com/getkey",
-            Icon = "rbxassetid://75920162824531"
-        },
-        {
-            Name = "Panda Development",
-            Desc = "Vượt link Panda qua hệ thống Ads",
-            Url = "https://pandadevelopment.net/getkey",
-            Icon = "rbxassetid://106310347705078"
-        }
+        {Name = "Platoboost", Url = "https://platoboost.com/getkey"},
+        {Name = "Panda Link", Url = "https://pandadevelopment.net/getkey"}
     },
-
-    -- Hàm kiểm tra Key
-    Validator = function(inputKey)
-        -- Thay đổi logic xác minh key của bạn ở đây (có thể gọi API/HTTP Request)
-        if inputKey == "AdminKey123" or #inputKey >= 10 then
+    Validator = function(key)
+        -- Thay đổi logic check key ở đây
+        if key == "PetaHub2026" or #key >= 8 then
             return true, "Xác thực thành công!"
-        else
-            return false, "Key không hợp lệ hoặc đã hết hạn!"
         end
+        return false, "Key không chính xác!"
     end
 }
 
 -- ScreenGui Parent Setup
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "CustomKeySystemUI"
+ScreenGui.Name = "WindUI_KeySystem"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-pcall(function()
-    ScreenGui.Parent = CoreGui
-end)
-if not ScreenGui.Parent then
-    ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-end
+pcall(function() ScreenGui.Parent = CoreGui end)
+if not ScreenGui.Parent then ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui") end
 
 -- Helper Functions
-local function CreateCorner(parent, radius)
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, radius or 8)
-    corner.Parent = parent
-    return corner
+local function AddCorner(parent, radius)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, radius or 10)
+    c.Parent = parent
+    return c
 end
 
-local function CreateStroke(parent, color, transparency)
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = color or Color3.fromRGB(255, 255, 255)
-    stroke.Transparency = transparency or 0.8
-    stroke.Thickness = 1
-    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    stroke.Parent = parent
-    return stroke
+local function AddStroke(parent, color, transparency)
+    local s = Instance.new("UIStroke")
+    s.Color = color or Color3.fromRGB(60, 60, 65)
+    s.Transparency = transparency or 0.7
+    s.Thickness = 1
+    s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    s.Parent = parent
+    return s
 end
 
--- Main Overlay & Container Frame
-local Overlay = Instance.new("Frame")
-Overlay.Name = "Overlay"
-Overlay.Size = UDim2.fromScale(1, 1)
-Overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Overlay.BackgroundTransparency = 1
-Overlay.Parent = ScreenGui
-
+-- Main Window Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 420, 0, 320)
+MainFrame.Size = UDim2.new(0, 390, 0, 240)
 MainFrame.Position = UDim2.fromScale(0.5, 0.5)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 22)
-MainFrame.BackgroundTransparency = 0.05
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
 MainFrame.ClipsDescendants = true
-MainFrame.Parent = Overlay
+MainFrame.Parent = ScreenGui
 
-CreateCorner(MainFrame, 16)
-CreateStroke(MainFrame, Color3.fromRGB(60, 60, 65), 0.5)
+AddCorner(MainFrame, 12)
+AddStroke(MainFrame, Color3.fromRGB(80, 80, 85), 0.6)
 
--- Header Section
+-- Top Header Bar (Title + Window Buttons)
 local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 50)
+Header.Size = UDim2.new(1, 0, 0, 35)
 Header.BackgroundTransparency = 1
 Header.Parent = MainFrame
 
+local LogoIcon = Instance.new("TextLabel")
+LogoIcon.Size = UDim2.new(0, 25, 0, 25)
+LogoIcon.Position = UDim2.new(0, 10, 0, 5)
+LogoIcon.Text = "✦"
+LogoIcon.TextColor3 = Color3.fromRGB(200, 200, 210)
+LogoIcon.TextSize = 14
+LogoIcon.BackgroundTransparency = 1
+LogoIcon.Parent = Header
+
 local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(1, -20, 0, 25)
-TitleLabel.Position = UDim2.new(0, 15, 0, 10)
-TitleLabel.Text = KeySystemConfig.Title
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextSize = 18
+TitleLabel.Size = UDim2.new(0, 150, 0, 20)
+TitleLabel.Position = UDim2.new(0, 35, 0, 4)
+TitleLabel.Text = Config.Title
+TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
+TitleLabel.TextSize = 13
 TitleLabel.Font = Enum.Font.SourceSansBold
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.BackgroundTransparency = 1
 TitleLabel.Parent = Header
 
 local SubTitleLabel = Instance.new("TextLabel")
-SubTitleLabel.Size = UDim2.new(1, -20, 0, 15)
-SubTitleLabel.Position = UDim2.new(0, 15, 0, 30)
-SubTitleLabel.Text = KeySystemConfig.SubTitle
-SubTitleLabel.TextColor3 = Color3.fromRGB(150, 150, 155)
-SubTitleLabel.TextSize = 13
+SubTitleLabel.Size = UDim2.new(0, 150, 0, 12)
+SubTitleLabel.Position = UDim2.new(0, 35, 0, 20)
+SubTitleLabel.Text = Config.SubTitle
+SubTitleLabel.TextColor3 = Color3.fromRGB(120, 120, 130)
+SubTitleLabel.TextSize = 10
 SubTitleLabel.Font = Enum.Font.SourceSans
 SubTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 SubTitleLabel.BackgroundTransparency = 1
 SubTitleLabel.Parent = Header
 
--- Content Container
-local ContentFrame = Instance.new("Frame")
-ContentFrame.Size = UDim2.new(1, -30, 0, 190)
-ContentFrame.Position = UDim2.new(0, 15, 0, 60)
-ContentFrame.BackgroundTransparency = 1
-ContentFrame.Parent = MainFrame
+-- Control Window Buttons (Minimize & Close)
+local BtnMinimize = Instance.new("TextButton")
+BtnMinimize.Size = UDim2.new(0, 30, 0, 30)
+BtnMinimize.Position = UDim2.new(1, -65, 0, 2)
+BtnMinimize.Text = "—"
+BtnMinimize.TextColor3 = Color3.fromRGB(180, 180, 190)
+BtnMinimize.TextSize = 12
+BtnMinimize.BackgroundTransparency = 1
+BtnMinimize.Parent = Header
 
-local UIList = Instance.new("UIListLayout")
-UIList.SortOrder = Enum.SortOrder.LayoutOrder
-UIList.Padding = UDim.new(0, 12)
-UIList.Parent = ContentFrame
+local BtnClose = Instance.new("TextButton")
+BtnClose.Size = UDim2.new(0, 30, 0, 30)
+BtnClose.Position = UDim2.new(1, -35, 0, 2)
+BtnClose.Text = "✕"
+BtnClose.TextColor3 = Color3.fromRGB(180, 180, 190)
+BtnClose.TextSize = 12
+BtnClose.BackgroundTransparency = 1
+BtnClose.Parent = Header
 
--- Note Label
-local NoteLabel = Instance.new("TextLabel")
-NoteLabel.Size = UDim2.new(1, 0, 0, 35)
-NoteLabel.Text = KeySystemConfig.Note
-NoteLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
-NoteLabel.TextSize = 13
-NoteLabel.Font = Enum.Font.SourceSans
-NoteLabel.TextWrapped = true
-NoteLabel.TextXAlignment = Enum.TextXAlignment.Left
-NoteLabel.BackgroundTransparency = 1
-NoteLabel.Parent = ContentFrame
+-- Sidebar Panel (Left)
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 110, 1, -40)
+Sidebar.Position = UDim2.new(0, 8, 0, 35)
+Sidebar.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
+Sidebar.Parent = MainFrame
+AddCorner(Sidebar, 8)
 
--- Key Input Field Box
+local SideList = Instance.new("UIListLayout")
+SideList.Padding = UDim.new(0, 4)
+SideList.Parent = Sidebar
+
+local SidePadding = Instance.new("UIPadding")
+SidePadding.PaddingTop = UDim.new(0, 6)
+SidePadding.PaddingLeft = UDim.new(0, 6)
+SidePadding.PaddingRight = UDim.new(0, 6)
+SidePadding.Parent = Sidebar
+
+local TabBtn = Instance.new("TextButton")
+TabBtn.Size = UDim2.new(1, 0, 0, 28)
+TabBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 42)
+TabBtn.Text = "  ★  Key Verification"
+TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+TabBtn.TextSize = 11
+TabBtn.Font = Enum.Font.SourceSansBold
+TabBtn.TextXAlignment = Enum.TextXAlignment.Left
+TabBtn.Parent = Sidebar
+AddCorner(TabBtn, 6)
+
+-- Content Panel (Right)
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, -134, 1, -40)
+Content.Position = UDim2.new(0, 124, 0, 35)
+Content.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
+Content.Parent = MainFrame
+AddCorner(Content, 8)
+
+local ContentPadding = Instance.new("UIPadding")
+ContentPadding.PaddingTop = UDim.new(0, 10)
+ContentPadding.PaddingLeft = UDim.new(0, 10)
+ContentPadding.PaddingRight = UDim.new(0, 10)
+ContentPadding.Parent = Content
+
+local ContentList = Instance.new("UIListLayout")
+ContentList.Padding = UDim.new(0, 8)
+ContentList.Parent = Content
+
+-- Key Input Box
 local InputContainer = Instance.new("Frame")
-InputContainer.Size = UDim2.new(1, 0, 0, 42)
-InputContainer.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
-InputContainer.Parent = ContentFrame
-CreateCorner(InputContainer, 8)
-CreateStroke(InputContainer, Color3.fromRGB(50, 50, 55), 0.5)
+InputContainer.Size = UDim2.new(1, 0, 0, 32)
+InputContainer.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
+InputContainer.Parent = Content
+AddCorner(InputContainer, 6)
+AddStroke(InputContainer, Color3.fromRGB(55, 55, 60), 0.5)
 
 local KeyBox = Instance.new("TextBox")
-KeyBox.Size = UDim2.new(1, -20, 1, 0)
-KeyBox.Position = UDim2.new(0, 10, 0, 0)
-KeyBox.PlaceholderText = "Nhập Key của bạn vào đây..."
-KeyBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 105)
+KeyBox.Size = UDim2.new(1, -12, 1, 0)
+KeyBox.Position = UDim2.new(0, 8, 0, 0)
+KeyBox.PlaceholderText = "Paste Key here..."
+KeyBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 110)
 KeyBox.Text = ""
-KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyBox.TextSize = 14
+KeyBox.TextColor3 = Color3.fromRGB(240, 240, 240)
+KeyBox.TextSize = 12
 KeyBox.Font = Enum.Font.SourceSans
 KeyBox.TextXAlignment = Enum.TextXAlignment.Left
-KeyBox.ClearTextOnFocus = false
 KeyBox.BackgroundTransparency = 1
+KeyBox.ClearTextOnFocus = false
 KeyBox.Parent = InputContainer
 
--- Status Label
-local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(1, 0, 0, 20)
-StatusLabel.Text = ""
-StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-StatusLabel.TextSize = 13
-StatusLabel.Font = Enum.Font.SourceSans
-StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Parent = ContentFrame
+-- Status Message
+local StatusText = Instance.new("TextLabel")
+StatusText.Size = UDim2.new(1, 0, 0, 14)
+StatusText.Text = ""
+StatusText.TextColor3 = Color3.fromRGB(255, 85, 85)
+StatusText.TextSize = 11
+StatusText.Font = Enum.Font.SourceSans
+StatusText.TextXAlignment = Enum.TextXAlignment.Left
+StatusText.BackgroundTransparency = 1
+StatusText.Parent = Content
 
--- Buttons Action Frame
-local ActionsFrame = Instance.new("Frame")
-ActionsFrame.Size = UDim2.new(1, -30, 0, 42)
-ActionsFrame.Position = UDim2.new(0, 15, 1, -55)
-ActionsFrame.BackgroundTransparency = 1
-ActionsFrame.Parent = MainFrame
+-- Action Buttons Container
+local BtnGroup = Instance.new("Frame")
+BtnGroup.Size = UDim2.new(1, 0, 0, 30)
+BtnGroup.BackgroundTransparency = 1
+BtnGroup.Parent = Content
 
-local ActionList = Instance.new("UIListLayout")
-ActionList.FillDirection = Enum.FillDirection.Horizontal
-ActionList.HorizontalAlignment = Enum.HorizontalAlignment.Right
-ActionList.Padding = UDim.new(0, 10)
-ActionList.Parent = ActionsFrame
+local BtnGroupList = Instance.new("UIListLayout")
+BtnGroupList.FillDirection = Enum.FillDirection.Horizontal
+BtnGroupList.HorizontalAlignment = Enum.HorizontalAlignment.Right
+BtnGroupList.Padding = UDim.new(0, 6)
+BtnGroupList.Parent = BtnGroup
 
--- Create Custom Button Utility
-local function CreateButton(text, bgColor, textColor, width)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, width or 100, 1, 0)
-    btn.BackgroundColor3 = bgColor
-    btn.Text = text
-    btn.TextColor3 = textColor
-    btn.TextSize = 14
-    btn.Font = Enum.Font.SourceSansBold
-    btn.AutoButtonColor = false
-    CreateCorner(btn, 8)
-    
-    -- Hover Animations
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundTransparency = 0.2}):Play()
-    end)
-    btn.MouseLeave:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
-    end)
-    
-    return btn
+local function CreateActionBtn(text, color, width)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, width, 1, 0)
+    b.BackgroundColor3 = color
+    b.Text = text
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.TextSize = 11
+    b.Font = Enum.Font.SourceSansBold
+    AddCorner(b, 6)
+    return b
 end
 
--- Service Dropdown Sub-Menu Frame
+local GetKeyBtn = CreateActionBtn("Get Key", Color3.fromRGB(40, 40, 45), 70)
+local VerifyBtn = CreateActionBtn("Verify", Color3.fromRGB(50, 110, 220), 75)
+GetKeyBtn.Parent = BtnGroup
+VerifyBtn.Parent = BtnGroup
+
+-- Get Key Options Dropdown
 local ServiceMenu = Instance.new("Frame")
-ServiceMenu.Size = UDim2.new(1, -30, 0, 0)
-ServiceMenu.Position = UDim2.new(0, 15, 0, 220)
-ServiceMenu.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
-ServiceMenu.ClipsDescendants = true
+ServiceMenu.Size = UDim2.new(1, 0, 0, 50)
+ServiceMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 34)
 ServiceMenu.Visible = false
-ServiceMenu.Parent = MainFrame
-CreateCorner(ServiceMenu, 8)
-CreateStroke(ServiceMenu, Color3.fromRGB(60, 60, 65), 0.5)
+ServiceMenu.Parent = Content
+AddCorner(ServiceMenu, 6)
+AddStroke(ServiceMenu, Color3.fromRGB(60, 60, 65), 0.5)
 
-local ServiceList = Instance.new("UIListLayout")
-ServiceList.SortOrder = Enum.SortOrder.LayoutOrder
-ServiceList.Padding = UDim.new(0, 5)
-ServiceList.Parent = ServiceMenu
+local SrvList = Instance.new("UIListLayout")
+SrvList.Padding = UDim.new(0, 2)
+SrvList.Parent = ServiceMenu
 
-local ServicePadding = Instance.new("UIPadding")
-ServicePadding.PaddingTop = UDim.new(0, 8)
-ServicePadding.PaddingLeft = UDim.new(0, 8)
-ServicePadding.PaddingRight = UDim.new(0, 8)
-ServicePadding.Parent = ServiceMenu
+for _, s in ipairs(Config.Services) do
+    local sb = Instance.new("TextButton")
+    sb.Size = UDim2.new(1, 0, 0, 24)
+    sb.BackgroundTransparency = 1
+    sb.Text = "  • " .. s.Name
+    sb.TextColor3 = Color3.fromRGB(200, 200, 210)
+    sb.TextSize = 11
+    sb.Font = Enum.Font.SourceSans
+    sb.TextXAlignment = Enum.TextXAlignment.Left
+    sb.Parent = ServiceMenu
 
-for _, srv in ipairs(KeySystemConfig.Services) do
-    local srvBtn = Instance.new("TextButton")
-    srvBtn.Size = UDim2.new(1, 0, 0, 35)
-    srvBtn.BackgroundColor3 = Color3.fromRGB(38, 38, 42)
-    srvBtn.Text = "  " .. srv.Name
-    srvBtn.TextColor3 = Color3.fromRGB(220, 220, 225)
-    srvBtn.TextSize = 13
-    srvBtn.Font = Enum.Font.SourceSans
-    srvBtn.TextXAlignment = Enum.TextXAlignment.Left
-    srvBtn.Parent = ServiceMenu
-    CreateCorner(srvBtn, 6)
-
-    srvBtn.MouseButton1Click:Connect(function()
+    sb.MouseButton1Click:Connect(function()
         if setclipboard then
-            setclipboard(srv.Url)
-            StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 120)
-            StatusLabel.Text = "Đã sao chép liên kết: " .. srv.Name
+            setclipboard(s.Url)
+            StatusText.TextColor3 = Color3.fromRGB(100, 230, 130)
+            StatusText.Text = "Copied link to clipboard!"
         end
     end)
 end
 
--- Action Buttons Initialization
-local GetKeyBtn = CreateButton("Lấy Key", Color3.fromRGB(45, 45, 50), Color3.fromRGB(255, 255, 255), 100)
-local SubmitBtn = CreateButton("Xác Nhận", Color3.fromRGB(0, 145, 255), Color3.fromRGB(255, 255, 255), 110)
+-- Floating Open Button (Hiển thị khi đóng UI)
+local ToggleButton = Instance.new("ImageButton")
+ToggleButton.Name = "OpenUI_Toggle"
+ToggleButton.Size = UDim2.new(0, 40, 0, 40)
+ToggleButton.Position = UDim2.new(0, 15, 0.5, -20)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
+ToggleButton.Visible = false
+ToggleButton.Parent = ScreenGui
+AddCorner(ToggleButton, 20)
+AddStroke(ToggleButton, Color3.fromRGB(80, 80, 90), 0.5)
 
-GetKeyBtn.Parent = ActionsFrame
-SubmitBtn.Parent = ActionsFrame
+local ToggleIcon = Instance.new("TextLabel")
+ToggleIcon.Size = UDim2.fromScale(1, 1)
+ToggleIcon.Text = "✦"
+ToggleIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleIcon.TextSize = 18
+ToggleIcon.BackgroundTransparency = 1
+ToggleIcon.Parent = ToggleButton
 
--- Interactivity & Logic
-local isMenuOpen = false
-GetKeyBtn.MouseButton1Click:Connect(function()
-    isMenuOpen = not isMenuOpen
-    if isMenuOpen then
-        ServiceMenu.Visible = true
-        TweenService:Create(ServiceMenu, TweenInfo.new(0.25, Enum.EasingStyle.Quint), {Size = UDim2.new(1, -30, 0, #KeySystemConfig.Services * 40 + 10)}):Play()
-    else
-        local tween = TweenService:Create(ServiceMenu, TweenInfo.new(0.2, Enum.EasingStyle.Quint), {Size = UDim2.new(1, -30, 0, 0)})
-        tween:Play()
-        tween.Completed:Connect(function()
-            if not isMenuOpen then ServiceMenu.Visible = false end
-        end)
+-- Draggable UI Feature
+local dragging, dragInput, dragStart, startPos
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
     end
 end)
 
--- Execute Verification Process
-local function VerifyKey()
-    local input = KeyBox.Text
-    if input == "" then
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = "Vui lòng nhập Key trước khi xác nhận!"
+MainFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Button Click Actions
+GetKeyBtn.MouseButton1Click:Connect(function()
+    ServiceMenu.Visible = not ServiceMenu.Visible
+end)
+
+local function CloseUI()
+    MainFrame.Visible = false
+    ToggleButton.Visible = true
+end
+
+BtnMinimize.MouseButton1Click:Connect(CloseUI)
+BtnClose.MouseButton1Click:Connect(CloseUI)
+
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    ToggleButton.Visible = false
+end)
+
+VerifyBtn.MouseButton1Click:Connect(function()
+    local val = KeyBox.Text
+    if val == "" then
+        StatusText.TextColor3 = Color3.fromRGB(255, 85, 85)
+        StatusText.Text = "Please enter a key!"
         return
     end
 
-    StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 80)
-    StatusLabel.Text = "Đang kiểm tra..."
+    StatusText.TextColor3 = Color3.fromRGB(255, 200, 80)
+    StatusText.Text = "Checking..."
+    task.wait(0.4)
 
-    task.wait(0.5)
-
-    local isValid, message = KeySystemConfig.Validator(input)
-    if isValid then
-        StatusLabel.TextColor3 = Color3.fromRGB(80, 255, 120)
-        StatusLabel.Text = message or "Thành công!"
+    local success, msg = Config.Validator(val)
+    if success then
+        StatusText.TextColor3 = Color3.fromRGB(100, 230, 130)
+        StatusText.Text = msg
+        if writefile then pcall(writefile, Config.SavedKeyFile, val) end
         
-        -- Save Key Cache
-        if writefile then
-            pcall(writefile, KeySystemConfig.SavedFileName, input)
-        end
-        
-        -- Smooth Fade-out Animation
-        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Play()
-        TweenService:Create(Overlay, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
-        
-        task.wait(0.35)
+        task.wait(0.5)
         ScreenGui:Destroy()
-        
-        -- Execute your script main code here
-        print("Key Verified! Main Script Loaded.")
+        print("Loaded Script Successfully!")
     else
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        StatusLabel.Text = message or "Key không chính xác!"
+        StatusText.TextColor3 = Color3.fromRGB(255, 85, 85)
+        StatusText.Text = msg
     end
-end
-
-SubmitBtn.MouseButton1Click:Connect(VerifyKey)
-
--- Smooth GUI Entrance Animation
-MainFrame.Size = UDim2.new(0, 0, 0, 0)
-TweenService:Create(Overlay, TweenInfo.new(0.25), {BackgroundTransparency = 0.5}):Play()
-TweenService:Create(MainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 420, 0, 320)}):Play()
+end)
