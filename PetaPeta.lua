@@ -8,16 +8,16 @@ local RunService = game:GetService("RunService")
 -- ==========================================
 local Window = WindUI:CreateWindow({
     Folder = "Thanh Le | Folder",
-    Title = "PetaHub",
+    Title = "HEOVLHub",
     Icon = "sparkles",
-    Author = "PetaHub",
+    Author = "ThanhLeInVn",
     Theme = "Dark",
     Size = UDim2.fromOffset(500, 350),
     HasOutline = true,
 })
 
 Window:EditOpenButton({
-    Title = "Open PetaHub ",
+    Title = "Open HEOVLHub 👹",
     Icon = "pointer",
     CornerRadius = UDim.new(0, 6),
     StrokeThickness = 2,
@@ -228,7 +228,7 @@ local function setESPMode(on)
     end
 end
 
--- 3. SPEED
+-- 3. SPEED LOGIC (ĐÃ SỬA)
 local speedEnabled = false
 local speedLoop = nil
 local normalSpeed = 16
@@ -240,12 +240,13 @@ local function setSpeedMode(on)
         speedLoop:Disconnect()
         speedLoop = nil
     end
+    
     if on then
         speedLoop = RunService.Heartbeat:Connect(function()
             local char = LocalPlayer.Character
             if char then
                 local hum = char:FindFirstChildWhichIsA("Humanoid")
-                if hum and hum.WalkSpeed ~= targetSpeed then
+                if hum then
                     hum.WalkSpeed = targetSpeed
                 end
             end
@@ -368,15 +369,25 @@ Tabs.Main:Toggle({
     end
 })
 
+-- Khởi tạo biến SpeedSlider trước để Toggle có thể gọi phương thức Lock/Unlock
+local SpeedSlider
+
 Tabs.Main:Toggle({
     Title = "Speed Hack",
     Default = false,
     Callback = function(state)
         setSpeedMode(state)
+        if SpeedSlider then
+            if state then
+                SpeedSlider:Unlock()
+            else
+                SpeedSlider:Lock()
+            end
+        end
     end
 })
 
-Tabs.Main:Slider({
+SpeedSlider = Tabs.Main:Slider({
     Title = "Speed Value",
     Value = {
         Min = 16,
@@ -385,8 +396,20 @@ Tabs.Main:Slider({
     },
     Callback = function(value)
         targetSpeed = value
+        if speedEnabled then
+            local char = LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChildWhichIsA("Humanoid")
+                if hum then
+                    hum.WalkSpeed = targetSpeed
+                end
+            end
+        end
     end
 })
+
+-- Mặc định khóa thanh Slider khi chưa bật Toggle Speed
+SpeedSlider:Lock()
 
 Tabs.Main:Toggle({
     Title = "Noclip (Anti-Void Map)",
@@ -413,18 +436,18 @@ Tabs.ESP:Paragraph({
 })
 
 -- --- TAB CREDITS & INFO ---
-Tabs.Credits:Section({ Title = "PetaHub Info" })
+Tabs.Credits:Section({ Title = "HEOVLHub Info" })
 
 Tabs.Credits:Paragraph({
     Title = "Info Script",
-    Desc = "ESP Chams Rainbow: PetaPeta, EnemyModel/EnemyModels (Auto)\nESP Item: Box, Safe, Key, Doll, Rope...\nAura: Pick Up / Open\nSpeed: WalkSpeed Adjustable\nNoclip: Walls Hack | Anti Void\n\nBy: PetaHub ",
+    Desc = "ESP Chams Rainbow: PetaPeta, EnemyModel/EnemyModels (Auto)\nESP Item: Box, Safe, Key, Doll, Rope...\nAura: Pick Up / Open\nSpeed: WalkSpeed Adjustable\nNoclip: Walls Hack | Anti Void\n\nBy: HEOVLHub  ",
 })
 
 Tabs.Credits:Button({
     Title = "Notification Hub",
     Callback = function()
         WindUI:Notify({
-            Title = "PetaHub ",
+            Title = "HEOVLHub 👹",
             Content = "WindUI theme successfully downloaded!",
             Duration = 5,
         })
