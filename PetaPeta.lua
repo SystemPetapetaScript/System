@@ -230,33 +230,33 @@ end
 
 -- 3. SPEED LOGIC (FIX LỖI CỨNG THANH VÀ KHÔNG ĐỔI TỐC ĐỘ)
 local speedEnabled = false
-local speedLoop = nil
 local normalSpeed = 16
 local targetSpeed = 16
 
-local function applySpeed(val)
+-- Vòng lặp cập nhật tốc độ liên tục để không bị reset bởi game
+RunService.Heartbeat:Connect(function()
     local char = LocalPlayer.Character
     if char then
         local hum = char:FindFirstChildWhichIsA("Humanoid")
         if hum then
-            hum.WalkSpeed = val
+            if speedEnabled then
+                hum.WalkSpeed = targetSpeed
+            end
         end
     end
-end
+end)
 
 local function setSpeedMode(on)
     speedEnabled = on
-    if speedLoop then
-        speedLoop:Disconnect()
-        speedLoop = nil
-    end
-
-    if on then
-        speedLoop = RunService.Heartbeat:Connect(function()
-            applySpeed(targetSpeed)
-        end)
-    else
-        applySpeed(normalSpeed)
+    -- Khi tắt hack speed, trả tốc độ nhân vật về mặc định
+    if not on then
+        local char = LocalPlayer.Character
+        if char then
+            local hum = char:FindFirstChildWhichIsA("Humanoid")
+            if hum then
+                hum.WalkSpeed = normalSpeed
+            end
+        end
     end
 end
 
@@ -368,7 +368,8 @@ Tabs.Main:Toggle({
 })
 
 Tabs.Main:Toggle({
-    Title = "Speed Hack",
+    Title = "Bật/Tắt Speed Hack",
+    Desc = "Bật công tắc này trước khi điều chỉnh thanh tốc độ",
     Default = false,
     Callback = function(state)
         setSpeedMode(state)
@@ -376,17 +377,14 @@ Tabs.Main:Toggle({
 })
 
 Tabs.Main:Slider({
-    Title = "Speed Value",
-    Value = {
-        Min = 16,
-        Max = 300,
-        Default = 16,
-    },
+    Title = "Tốc Độ (Speed Value)",
+    Desc = "Kéo để thay đổi tốc độ nhân vật tùy ý. Kéo về 16 để trở lại mặc định.",
+    Step = 1,
+    Min = 16,
+    Max = 300,
+    Default = 16,
     Callback = function(value)
         targetSpeed = tonumber(value) or 16
-        if speedEnabled then
-            applySpeed(targetSpeed)
-        end
     end
 })
 
