@@ -1,8 +1,9 @@
--- [[ WINDUI STYLE KEY SYSTEM UI - CUSTOM ICON ]] --
+-- [[ WINDUI STYLE KEY SYSTEM UI - FIXED IMAGE LOAD ]] --
 
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local ContentProvider = game:GetService("ContentProvider")
 
 -- Configuration
 local Config = {
@@ -66,22 +67,29 @@ Header.Size = UDim2.new(1, 0, 0, 35)
 Header.BackgroundTransparency = 1
 Header.Parent = MainFrame
 
--- Khung chứa Icon Hình Tròn (Tránh bị bóp méo)
+-- Khung chứa Icon Hình Tròn
 local LogoContainer = Instance.new("Frame")
 LogoContainer.Size = UDim2.new(0, 22, 0, 22)
 LogoContainer.Position = UDim2.new(0, 10, 0, 6)
 LogoContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 LogoContainer.ClipsDescendants = true
 LogoContainer.Parent = Header
-AddCorner(LogoContainer, 100) -- Làm cho khung chứa bo tròn hoàn toàn
+AddCorner(LogoContainer, 100)
 AddStroke(LogoContainer, Color3.fromRGB(80, 80, 90), 0.5)
 
 local LogoImage = Instance.new("ImageLabel")
 LogoImage.Size = UDim2.fromScale(1, 1)
 LogoImage.Image = Config.IconId
-LogoImage.ScaleType = Enum.ScaleType.ScaleToFit
+LogoImage.ScaleType = Enum.ScaleType.Fit
 LogoImage.BackgroundTransparency = 1
 LogoImage.Parent = LogoContainer
+
+-- Load ảnh an toàn không làm đen màn hình
+task.spawn(function()
+    pcall(function()
+        ContentProvider:PreloadAsync({LogoImage})
+    end)
+end)
 
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Size = UDim2.new(0, 150, 0, 20)
@@ -266,17 +274,17 @@ for _, s in ipairs(Config.Services) do
     end)
 end
 
--- Floating Circle Open Button (Cũng được thiết kế dạng hình tròn)
+-- Floating Circle Open Button
 local ToggleButton = Instance.new("ImageButton")
 ToggleButton.Name = "OpenUI_Toggle"
 ToggleButton.Size = UDim2.new(0, 42, 0, 42)
 ToggleButton.Position = UDim2.new(0, 15, 0.5, -21)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
 ToggleButton.Image = Config.IconId
-ToggleButton.ScaleType = Enum.ScaleType.ScaleToFit
+ToggleButton.ScaleType = Enum.ScaleType.Fit
 ToggleButton.Visible = false
 ToggleButton.Parent = ScreenGui
-AddCorner(ToggleButton, 100) -- Tạo hình tròn hoàn chỉnh cho nút Toggle
+AddCorner(ToggleButton, 100)
 AddStroke(ToggleButton, Color3.fromRGB(80, 80, 90), 0.6)
 
 -- Draggable UI Feature
