@@ -1,15 +1,22 @@
--- [[ WINDUI STYLE KEY SYSTEM UI - FIXED IMAGE LOAD ]] --
+-- [[ WINDUI KEY SYSTEM - FIXED ASSET ID ]] --
 
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local ContentProvider = game:GetService("ContentProvider")
 
+-- Xóa icon cũ bị lỗi cache nếu có
+pcall(function()
+    if isfile and isfile("PetaHub_Logo_Icon.png") then
+        delfile("PetaHub_Logo_Icon.png")
+    end
+end)
+
 -- Configuration
 local Config = {
     Title = "PetaHub",
     SubTitle = "Key System",
-    IconId = "rbxassetid://124717824553107", -- ID Icon của bạn
+    IconAssetId = "rbxassetid://76387149812215", -- ID mới của bạn
     SavedKeyFile = "PetaHub_Key.txt",
     Services = {
         {Name = "Platoboost", Url = "https://platoboost.com/getkey"},
@@ -67,10 +74,10 @@ Header.Size = UDim2.new(1, 0, 0, 35)
 Header.BackgroundTransparency = 1
 Header.Parent = MainFrame
 
--- Khung chứa Icon Hình Tròn
+-- Khung chứa Icon Hình Tròn chuẩn
 local LogoContainer = Instance.new("Frame")
-LogoContainer.Size = UDim2.new(0, 22, 0, 22)
-LogoContainer.Position = UDim2.new(0, 10, 0, 6)
+LogoContainer.Size = UDim2.new(0, 24, 0, 24)
+LogoContainer.Position = UDim2.new(0, 10, 0, 5)
 LogoContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 LogoContainer.ClipsDescendants = true
 LogoContainer.Parent = Header
@@ -79,12 +86,12 @@ AddStroke(LogoContainer, Color3.fromRGB(80, 80, 90), 0.5)
 
 local LogoImage = Instance.new("ImageLabel")
 LogoImage.Size = UDim2.fromScale(1, 1)
-LogoImage.Image = Config.IconId
-LogoImage.ScaleType = Enum.ScaleType.Fit
+LogoImage.Image = Config.IconAssetId
 LogoImage.BackgroundTransparency = 1
+LogoImage.ScaleType = Enum.ScaleType.Fit
 LogoImage.Parent = LogoContainer
 
--- Load ảnh an toàn không làm đen màn hình
+-- Load trước ảnh để tránh lỗi bị trắng/đen
 task.spawn(function()
     pcall(function()
         ContentProvider:PreloadAsync({LogoImage})
@@ -93,7 +100,7 @@ end)
 
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Size = UDim2.new(0, 150, 0, 20)
-TitleLabel.Position = UDim2.new(0, 38, 0, 4)
+TitleLabel.Position = UDim2.new(0, 40, 0, 4)
 TitleLabel.Text = Config.Title
 TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
 TitleLabel.TextSize = 13
@@ -104,7 +111,7 @@ TitleLabel.Parent = Header
 
 local SubTitleLabel = Instance.new("TextLabel")
 SubTitleLabel.Size = UDim2.new(0, 150, 0, 12)
-SubTitleLabel.Position = UDim2.new(0, 38, 0, 20)
+SubTitleLabel.Position = UDim2.new(0, 40, 0, 20)
 SubTitleLabel.Text = Config.SubTitle
 SubTitleLabel.TextColor3 = Color3.fromRGB(120, 120, 130)
 SubTitleLabel.TextSize = 10
@@ -113,7 +120,7 @@ SubTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 SubTitleLabel.BackgroundTransparency = 1
 SubTitleLabel.Parent = Header
 
--- Control Window Buttons (Minimize & Close)
+-- Control Window Buttons
 local BtnMinimize = Instance.new("TextButton")
 BtnMinimize.Size = UDim2.new(0, 30, 0, 30)
 BtnMinimize.Position = UDim2.new(1, -65, 0, 2)
@@ -132,7 +139,7 @@ BtnClose.TextSize = 12
 BtnClose.BackgroundTransparency = 1
 BtnClose.Parent = Header
 
--- Sidebar Panel (Left)
+-- Sidebar Panel
 local Sidebar = Instance.new("Frame")
 Sidebar.Size = UDim2.new(0, 110, 1, -40)
 Sidebar.Position = UDim2.new(0, 8, 0, 35)
@@ -161,7 +168,7 @@ TabBtn.TextXAlignment = Enum.TextXAlignment.Left
 TabBtn.Parent = Sidebar
 AddCorner(TabBtn, 6)
 
--- Content Panel (Right)
+-- Content Panel
 local Content = Instance.new("Frame")
 Content.Size = UDim2.new(1, -134, 1, -40)
 Content.Position = UDim2.new(0, 124, 0, 35)
@@ -280,14 +287,14 @@ ToggleButton.Name = "OpenUI_Toggle"
 ToggleButton.Size = UDim2.new(0, 42, 0, 42)
 ToggleButton.Position = UDim2.new(0, 15, 0.5, -21)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
-ToggleButton.Image = Config.IconId
+ToggleButton.Image = Config.IconAssetId
 ToggleButton.ScaleType = Enum.ScaleType.Fit
 ToggleButton.Visible = false
 ToggleButton.Parent = ScreenGui
 AddCorner(ToggleButton, 100)
 AddStroke(ToggleButton, Color3.fromRGB(80, 80, 90), 0.6)
 
--- Draggable UI Feature
+-- Draggable UI
 local dragging, dragInput, dragStart, startPos
 MainFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -310,7 +317,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Button Click Actions
+-- Button Actions
 GetKeyBtn.MouseButton1Click:Connect(function()
     ServiceMenu.Visible = not ServiceMenu.Visible
 end)
