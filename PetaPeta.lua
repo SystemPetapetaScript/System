@@ -8,16 +8,16 @@ local RunService = game:GetService("RunService")
 -- ==========================================
 local Window = WindUI:CreateWindow({
     Folder = "Thanh Le | Folder",
-    Title = "HEOVLHub",
+    Title = "PetaHub",
     Icon = "sparkles",
-    Author = "ThanhLeInVn",
+    Author = "PetaHub",
     Theme = "Dark",
     Size = UDim2.fromOffset(500, 350),
     HasOutline = true,
 })
 
 Window:EditOpenButton({
-    Title = "Open HEOVLHub 👹",
+    Title = "Open PetaHub  ",
     Icon = "pointer",
     CornerRadius = UDim.new(0, 6),
     StrokeThickness = 2,
@@ -228,11 +228,21 @@ local function setESPMode(on)
     end
 end
 
--- 3. SPEED LOGIC (ĐÃ SỬA)
+-- 3. SPEED LOGIC (FIX LỖI CỨNG THANH VÀ KHÔNG ĐỔI TỐC ĐỘ)
 local speedEnabled = false
 local speedLoop = nil
 local normalSpeed = 16
 local targetSpeed = 16
+
+local function applySpeed(val)
+    local char = LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChildWhichIsA("Humanoid")
+        if hum then
+            hum.WalkSpeed = val
+        end
+    end
+end
 
 local function setSpeedMode(on)
     speedEnabled = on
@@ -240,25 +250,13 @@ local function setSpeedMode(on)
         speedLoop:Disconnect()
         speedLoop = nil
     end
-    
+
     if on then
         speedLoop = RunService.Heartbeat:Connect(function()
-            local char = LocalPlayer.Character
-            if char then
-                local hum = char:FindFirstChildWhichIsA("Humanoid")
-                if hum then
-                    hum.WalkSpeed = targetSpeed
-                end
-            end
+            applySpeed(targetSpeed)
         end)
     else
-        local char = LocalPlayer.Character
-        if char then
-            local hum = char:FindFirstChildWhichIsA("Humanoid")
-            if hum then
-                hum.WalkSpeed = normalSpeed
-            end
-        end
+        applySpeed(normalSpeed)
     end
 end
 
@@ -369,25 +367,15 @@ Tabs.Main:Toggle({
     end
 })
 
--- Khởi tạo biến SpeedSlider trước để Toggle có thể gọi phương thức Lock/Unlock
-local SpeedSlider
-
 Tabs.Main:Toggle({
     Title = "Speed Hack",
     Default = false,
     Callback = function(state)
         setSpeedMode(state)
-        if SpeedSlider then
-            if state then
-                SpeedSlider:Unlock()
-            else
-                SpeedSlider:Lock()
-            end
-        end
     end
 })
 
-SpeedSlider = Tabs.Main:Slider({
+Tabs.Main:Slider({
     Title = "Speed Value",
     Value = {
         Min = 16,
@@ -395,21 +383,12 @@ SpeedSlider = Tabs.Main:Slider({
         Default = 16,
     },
     Callback = function(value)
-        targetSpeed = value
+        targetSpeed = tonumber(value) or 16
         if speedEnabled then
-            local char = LocalPlayer.Character
-            if char then
-                local hum = char:FindFirstChildWhichIsA("Humanoid")
-                if hum then
-                    hum.WalkSpeed = targetSpeed
-                end
-            end
+            applySpeed(targetSpeed)
         end
     end
 })
-
--- Mặc định khóa thanh Slider khi chưa bật Toggle Speed
-SpeedSlider:Lock()
 
 Tabs.Main:Toggle({
     Title = "Noclip (Anti-Void Map)",
@@ -436,18 +415,18 @@ Tabs.ESP:Paragraph({
 })
 
 -- --- TAB CREDITS & INFO ---
-Tabs.Credits:Section({ Title = "HEOVLHub Info" })
+Tabs.Credits:Section({ Title = "PetaHub Info" })
 
 Tabs.Credits:Paragraph({
     Title = "Info Script",
-    Desc = "ESP Chams Rainbow: PetaPeta, EnemyModel/EnemyModels (Auto)\nESP Item: Box, Safe, Key, Doll, Rope...\nAura: Pick Up / Open\nSpeed: WalkSpeed Adjustable\nNoclip: Walls Hack | Anti Void\n\nBy: HEOVLHub  ",
+    Desc = "ESP Chams Rainbow: PetaPeta, EnemyModel/EnemyModels (Auto)\nESP Item: Box, Safe, Key, Doll, Rope...\nAura: Pick Up / Open\nSpeed: WalkSpeed Adjustable\nNoclip: Walls Hack | Anti Void\n\nBy: PetaHub  ",
 })
 
 Tabs.Credits:Button({
     Title = "Notification Hub",
     Callback = function()
         WindUI:Notify({
-            Title = "HEOVLHub 👹",
+            Title = "PetaHub  ",
             Content = "WindUI theme successfully downloaded!",
             Duration = 5,
         })
